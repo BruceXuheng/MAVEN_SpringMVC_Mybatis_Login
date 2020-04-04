@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="./css/loginhCss.css">
+
+</head>
+<body>
+<div class="loginbody">
+    <div id="content"></div>
+    <div class="logindata">
+        <h1>AJAX登录页</h1>
+        <br/>
+        账号:
+        <input type="text" name="uname" id="uname" title="姓名"/>
+        <br/>
+        密码:
+        <input type="text" name="upwd" id="upwd" title="密码"/>
+        <br>
+        <br>
+        <input type="submit" value="注册" id="register">
+        <input type="submit" value="登录" id="login">
+        <input type="submit" value="查看用户数据" id="select">
+    </div>
+
+    <form action="/fromRegister" method="post">
+        <h1>Form注册页</h1>
+        <br/>
+        账号:
+        <input type="text" name="uname" title="姓名"/>
+        <br/>
+        密码:
+        <input type="text" name="upwd" title="密码"/>
+        <br>
+        <input type="submit" value="注册">
+    </form>
+    <form action="/fromSelect" method="post">
+        <h1>from查询数据</h1>
+        <br>
+        <input type="submit" value="from查询ALLUser数据">
+    </form>
+</div>
+
+<script src="./js/jquery-3.4.1.min.js"></script>
+<script src="./js/loginh.js"></script>
+<script type="text/javascript">
+
+    // var jsondata = "{\"rescode\":\"00\",\"resdesc\":\"查询成功\",\"ext\":\"[{\\\"id\\\":3,\\\"uname\\\":\\\"33\\\",\\\"upwd\\\":\\\"88\\\"},{\\\"id\\\":2,\\\"uname\\\":\\\"88\\\",\\\"upwd\\\":\\\"1234567890\\\"}]\"}";
+    // var json = JSON.parse(jsondata);
+    // console.log(json.rescode);
+    // var ext = JSON.parse(json.ext);
+    // console.log("=-------------");
+    // for (var i = 0; i < ext.length; i++) {
+    //
+    //     console.log(ext[i]);
+    // }
+
+    $("#login").click(function (e) {
+        // alert("login");
+        console.log("登录");
+        var uname = $("#uname").val();
+        var upwd = $("#upwd").val();
+        var sendMsg = {
+            uname: uname,
+            upwd: upwd
+        };
+        console.log("请求信息：" + JSON.stringify(sendMsg));
+        $.ajax({
+            "url": "/login",
+            "type": "POST",
+            contentType:"application/json",
+            "data": JSON.stringify(sendMsg),
+            "dataType": "json",
+            "success": function (json) {
+                console.log("success 返回数据=" + json);
+                console.log("success 返回数据=" + json.rescode);
+                var rescode = json.rescode;
+                var resdesc = json.resdesc;
+                var ext = json.ext;
+                if(rescode==00){
+                    alert("登陆成功")
+                }else{
+                    alert(rescode+resdesc)
+                }
+            },
+            "error": function (xmlhttp, errorText) {
+                console.log(xmlhttp);
+                console.log(typeof xmlhttp.status);
+                switch (xmlhttp.status) {
+                    case 404:
+                        alert("未找到URL资源");
+                        break;
+                    case 405:
+                        alert("无效请求方式");
+                        break;
+                    case 500:
+                        alert("服务器内部错误");
+                        break;
+                    default:
+                        alert("异常");
+                        break;
+                }
+                ;
+            }
+
+        });
+    });
+    $("#register").click(function (e) {
+        console.log("注册");
+
+        var uname = $("#uname").val();
+        var upwd = $("#upwd").val();
+        var sendMsg = {
+            uname: uname,
+            upwd: upwd
+        };
+        console.log("请求信息：" + JSON.stringify(sendMsg));
+        $.ajax({
+            "url": "/ajaxRegister",
+            "type": "POST",
+            contentType:"application/json",
+            "data": JSON.stringify(sendMsg),
+            "dataType": "json",
+            "success": function (json) {
+                console.log("success 返回数据=" + json);
+                var rescode = json.rescode;
+                var resdesc = json.resdesc;
+                if(rescode==00){
+                    alert(resdesc);
+                }else{
+                    alert(rescode+" "+resdesc);
+                }
+            },
+            "error": function (xmlhttp, errorText) {
+                console.log(xmlhttp);
+                console.log(typeof xmlhttp.status);
+                switch (xmlhttp.status) {
+                    case 404:
+                        alert("未找到URL资源");
+                        break;
+                    case 405:
+                        alert("无效请求方式");
+                        break;
+                    case 500:
+                        alert("服务器内部错误");
+                        break;
+                    default:
+                        alert("异常");
+                        break;
+                }
+                ;
+            }
+
+        });
+    });
+    $("#select").click(function (e) {
+        // alert("login");
+        console.log("查询");
+        var uname = $("#uname").val();
+        var upwd = $("#upwd").val();
+        var sendMsg = {
+            uname: uname,
+            upwd: upwd
+        };
+        console.log("请求信息：" + JSON.stringify(sendMsg));
+        $.ajax({
+            "url": "/ajxaSelect",
+            "type": "POST",
+            "contentType": "application/json",
+            "data": JSON.stringify(sendMsg),
+            "dataType": "json",
+            "success": function (json) {
+                console.log("success 返回数据=" + JSON.stringify(json));
+                var rescode = json.rescode;
+                var resdesc = json.resdesc;
+                var ext = JSON.parse(json.ext);
+                console.log("success 返回数据=" + ext);
+                if(rescode==00){
+                    alert("查询成功");
+                    var content = "";
+                    for (var i =0 ;i<ext.length;i++){
+                        console.log(ext[i]);
+                        console.log(ext[i].uname);
+                        content+=ext[i].id+" ";
+                        content+=ext[i].uname+" ";
+                        content+=ext[i].upwd+" ";
+                        content+="<br>";
+                    }
+                    $("#content").html(content);
+                }else{
+                    alert(rescode+resdesc)
+                }
+                // console.log("一级请求 size =" + json.length);
+                // for (var i = 0; i < json.length; i++) {
+                //     console.log("一级请求 for =" + json[i].name);
+                //     $("#firstS").append("<option value=" + json[i].name + ">" + json[i].name + "</option>");
+                // }
+            },
+            "error": function (xmlhttp, errorText) {
+                console.log(xmlhttp);
+                console.log(typeof xmlhttp.status);
+                switch (xmlhttp.status) {
+                    case 404:
+                        alert("未找到URL资源");
+                        break;
+                    case 405:
+                        alert("无效请求方式");
+                        break;
+                    case 500:
+                        alert("服务器内部错误");
+                        break;
+                    default:
+                        alert("异常");
+                        break;
+                }
+                ;
+            }
+
+        });
+    });
+</script>
+
+</body>
+</html>
